@@ -4,7 +4,7 @@
 #SBATCH --mem=1G
 #SBATCH --cpus-per-task=2
 
-# reads = $1
+Reads=$1
 
 mkdir fastqc
-fastqc $1 -t 2 -o fastqc
+fastqc $Reads -t 2 -o fastqc
