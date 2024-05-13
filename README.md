@@ -1,6 +1,8 @@
 # *Rhynchosporium* Phylogeny
 Phylogenetic tree reconstruction using available *Rhynchosporium commune* WGS data.
 
+<br>
+
 ## Data Preparation
 
 ### Download WGS data and genome from NCBI
@@ -15,8 +17,6 @@ Download *R. commune* UK7 data and genome, and uncompress:
 conda activate ncbi_datasets
 datasets download genome accession GCA_900074885.1 --filename GCA_900074885.1.zip
 ```
-
-<br>
 
 ### Quality Control
 QC raw sequencing data:
@@ -51,6 +51,8 @@ Rename reads to "Run_geo_loc_name_country_Collection_Date_readDirection.fastq.gz
 python scripts/rename_reads.py SraRunTable.txt trimmed/ renamed_reads/
 ```
 
+<br>
+
 ## Phylogenetic Tree
 
 Assemble phylogenetic tree based on SNPs.
@@ -78,8 +80,6 @@ for file in *sam; do
     sbatch ../scripts/samtools_sort.sh $file
 done
 ```
-
-<br>
 
 ### Variant Calling
 Index genome for variant calling:
