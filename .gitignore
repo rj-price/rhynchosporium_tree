@@ -1,6 +1,7 @@
+alignment
 GCA_900074885.1
-git_ignore
-R_commune_UK7.fasta
-R_commune_UK7.stats
 renamed_reads
 trimmed
+UK7
+variant_calling
+rhynchosporium.treefile

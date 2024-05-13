@@ -1,5 +1,5 @@
 # *Rhynchosporium* Phylogeny
-Phylogenetic tree reconstruction using available *Rhynchosporium commune* data.
+Phylogenetic tree reconstruction using available *Rhynchosporium commune* WGS data.
 
 ## Data Preparation
 
@@ -15,6 +15,8 @@ Download *R. commune* UK7 data and genome, and uncompress:
 conda activate ncbi_datasets
 datasets download genome accession GCA_900074885.1 --filename GCA_900074885.1.zip
 ```
+
+<br>
 
 ### Quality Control
 QC raw sequencing data:
@@ -76,6 +78,8 @@ for file in *sam; do
     sbatch ../scripts/samtools_sort.sh $file
 done
 ```
+
+<br>
 
 ### Variant Calling
 Index genome for variant calling:
@@ -144,6 +148,16 @@ Run RAxML-ng:
 ```bash
 sbatch ../scripts/raxml.sh rhynchosporium_highqual.phy
 ```
+
+<br>
+
+## Visualise Tree
+Visualise tree using [iTOL](https://itol.embl.de/).
+
+<center><img src="rhyncho_tree_branch.jpg" alt="Phylogenetic Tree with Branch Distances" width="800"/></center>
+<center><img src="rhyncho_tree_no-branch.jpg" alt="Phylogenetic Tree without Branch Distances" width="800"/></center>
+
+<br>
 
 ## References
 <a id="ref1">1.</a> Mohd-Assaad N, McDonald BA, Croll D. Genome-Wide Detection of Genes Under Positive Selection in Worldwide Populations of the Barley Scald Pathogen. Genome Biol Evol. 2018 Apr 1;10(5):1315-1332. doi: 10.1093/gbe/evy087. PMID: 29722810; PMCID: [PMC5972619](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5972619)
