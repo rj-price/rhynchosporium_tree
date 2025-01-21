@@ -1,7 +1,30 @@
 # *Rhynchosporium* Phylogeny
 Phylogenetic tree reconstruction using available *Rhynchosporium commune* WGS data.
 
+**You can find the full walkthrough of this analysis on my [blog](https://rjprice.bio/blog/2025/snp_tree/).**
+
 <br>
+
+## Environment Setup
+Set up new conda environment for all required software:
+```bash
+# Create conda environment
+conda create -n snp_tree \
+	ncbi-datasets-cli \
+	fastqc \
+	multiqc \
+	trimmomatic \
+	python \
+	pandas \
+	biopython \
+	bwa \
+	samtools \
+	bcftools \
+	raxml-ng
+
+# Activate conda environment
+conda activate snp_tree
+```
 
 ## Data Preparation
 
@@ -12,10 +35,11 @@ bash scripts/ena-file-download-selected-files-20240216-1125.sh
 bash scripts/ena-file-download-selected-files-20240216-1138.sh
 ```
 
-Download *R. commune* UK7 data and genome, and uncompress:
+Download *R. commune* UK7 data and genome, uncompress, move and rename:
 ```bash
 conda activate ncbi_datasets
 datasets download genome accession GCA_900074885.1 --filename GCA_900074885.1.zip
+mv ncbi_dataset/data/GCA_900074885.1/GCA_900074885.1_version_1_genomic.fna R_commune_UK7.fasta
 ```
 
 ### Quality Control
@@ -33,9 +57,9 @@ Trim adapters and low quality sequence, and QC trimmed reads:
 mkdir trimmed && cd trimmed
 
 # Trim
-for file in ../reads/*_1.fastq.gz; do 
-    file2=$(ls $file | sed s/"_1.fastq.gz"//g)
-    sbatch ../scripts/trimmomatic_pe.sh $file "$file2"_2.fastq.gz
+for fwd in ../reads/*_1.fastq.gz; do
+    rev=$(ls $fwd | sed 's/_1/_2/g')
+    sbatch ../scripts/trimmomatic_pe.sh $fwd $rev
 done
 
 # QC trimmed reads
@@ -68,9 +92,9 @@ Map reads to genome:
 ```bash
 mkdir alignment && cd alignment
 
-for file in ../renamed_reads/*_F.fastq.gz; do 
-    file2=$(ls $file | sed s/"_F.fastq.gz"//g)
-    sbatch ../scripts/bwa-mem.sh ../UK7/R_commune_UK7.fasta $file "$file2"_R.fastq.gz
+for fwd in ../renamed_reads/*_F.fastq.gz; do
+    rev=$(ls $fwd | sed 's/_F/_R/g')
+    sbatch ../scripts/bwa-mem.sh ../UK7/R_commune_UK7.fasta $fwd $rev
 done
 ```
 
@@ -102,31 +126,22 @@ sbatch ../scripts/bcftools_call.sh ../UK7/R_commune_UK7.fasta rhynchosporium.lis
 ### Variant Filtering
 Check total number of variants:
 ```bash
-bcftools view -H rhynchosporium.bcf | wc -l 
+bcftools view -H rhynchosporium.vcf | wc -l 
 # 5911174
-```
-
-Remove sites with less than 10 supporting reads:
-```bash
-bcftools view rhynchosporium.bcf | vcfutils.pl varFilter -d10 - > rhynchosporium_filt.vcf
-
-# Check number of remaining variants
-bcftools view -H rhynchosporium_filt.vcf | wc -l 
-# 4784455
 ```
 
 Calculate average and maximum QUAL scores:
 ```bash
-grep -v '^#' rhynchosporium_filt.vcf | awk 'BEGIN {max=0} {sum+=$6; if ($6>max) {max=$6}} END {print "Average qual: "sum/NR "\tMax qual: " max}'
+grep -v '^#' rhynchosporium.vcf | awk 'BEGIN {max=0} {sum+=$6; if ($6>max) {max=$6}} END {print "Average qual: "sum/NR "\tMax qual: " max}'
 # Average qual: 743.252   Max qual: 999
 ```
 
 Check number of high quality (QUAL>800) SNPs and export to new file:
 ```bash
-bcftools view rhynchosporium_filt.vcf -H -e 'QUAL<800' --types snps | wc -l 
+bcftools view rhynchosporium.vcf -H -e 'QUAL<800' --types snps | wc -l 
 # 3426167
 
-bcftools view rhynchosporium_filt.vcf -e 'QUAL<800' --types snps > rhynchosporium_highqual.vcf
+bcftools view rhynchosporium.vcf -e 'QUAL<800' --types snps > rhynchosporium_highqual.vcf
 ```
 
 ### Reconstruct Phylogenetic Tree

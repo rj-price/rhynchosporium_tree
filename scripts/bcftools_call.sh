@@ -9,8 +9,5 @@ BamList=$2
 
 Prefix=$(basename $BamList .list)
 
-export MYCONDAPATH=/mnt/shared/scratch/jnprice/apps/conda
-source ${MYCONDAPATH}/bin/activate sam_bcf_tools_env
-
-bcftools mpileup --threads 8 -Ou -m 5 -f $Reference -b $BamList | \
-    bcftools call --threads 8 -cv --ploidy 1 -o $Prefix.bcf
+bcftools mpileup --threads 8 -Ou -m 10 -f $Reference -b $BamList | \
+    bcftools call --threads 8 -cv --ploidy 1 -o $Prefix.vcf

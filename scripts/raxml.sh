@@ -6,9 +6,6 @@
 
 PhylipFile=$1
 
-export MYCONDAPATH=/mnt/shared/scratch/jnprice/apps/conda
-source ${MYCONDAPATH}/bin/activate sam_bcf_tools_env
-
 # For just one ML tree
 raxml-ng --msa $PhylipFile --model GTR+ASC_LEWIS 
 

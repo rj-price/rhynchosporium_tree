@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
 #SBATCH -J samtools
-#SBATCH --partition=medium
+#SBATCH --partition=short
 #SBATCH --mem=10G
 #SBATCH --cpus-per-task=4
 
 SAM=$1
-
-export MYCONDAPATH=/mnt/shared/scratch/jnprice/apps/conda
-source ${MYCONDAPATH}/bin/activate sam_bcf_tools_env
-
 Short=$(basename $SAM .sam)
 
 samtools view -@ 8 -bS $SAM -o $Short.bam
